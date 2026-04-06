@@ -25,7 +25,7 @@ def tts():
         res = requests.post(
             f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVEN_VOICE_ID}",
             headers={"Content-Type": "application/json", "xi-api-key": eleven_key},
-            json={"text": text, "model_id": "eleven_multilingual_v2", "voice_settings": {"stability": 0.42, "similarity_boost": 0.85, "style": 0.3, "use_speaker_boost": True}},
+            json={"text": text, "model_id": "eleven_multilingual_v2", "voice_settings": {"stability": 0.75, "similarity_boost": 0.85, "style": 0.1, "use_speaker_boost": True}},
             timeout=20
         )
         print(f"ElevenLabs status: {res.status_code}")
