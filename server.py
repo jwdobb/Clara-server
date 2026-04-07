@@ -3,14 +3,14 @@ from flask_cors import CORS
 import requests
 import os
 import traceback
- 
+
 app = Flask(__name__)
 CORS(app)
- 
+
 @app.route("/health")
 def health():
     return jsonify({"status": "ok"})
- 
+
 @app.route("/tts", methods=["POST"])
 def tts():
     try:
@@ -18,12 +18,12 @@ def tts():
         text = data.get("text", "")
         eleven_key = data.get("eleven_key", "")
         voice_id = data.get("voice_id", "XB0fDUnXU5powFXDhCwa")
- 
+
         if not text or not eleven_key:
             return jsonify({"error": "missing params"}), 400
- 
-        print(f"TTS - {len(text)} chars, voice: {voice_id[:8]}")
- 
+
+        print(f"TTS - {len(text)} chars")
+
         res = requests.post(
             f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream",
             headers={
@@ -34,28 +34,25 @@ def tts():
                 "text": text,
                 "model_id": "eleven_turbo_v2_5",
                 "voice_settings": {
-                    "stability": 0.75,
+                    "stability": 0.85,
                     "similarity_boost": 0.75,
-                    "style": 0.1,
+                    "style": 0.0,
                     "use_speaker_boost": True
                 }
             },
             stream=True,
             timeout=20
         )
- 
-        print(f"ElevenLabs status: {res.status_code}")
- 
+
         if not res.ok:
-            body = res.text
-            print(f"ElevenLabs error: {body}")
-            return jsonify({"error": body}), 500
- 
+            print(f"ElevenLabs error: {res.text}")
+            return jsonify({"error": res.text}), 500
+
         def generate():
             for chunk in res.iter_content(chunk_size=512):
                 if chunk:
                     yield chunk
- 
+
         return Response(
             generate(),
             mimetype="audio/mpeg",
@@ -65,12 +62,12 @@ def tts():
                 "X-Accel-Buffering": "no"
             }
         )
- 
+
     except Exception as e:
         print(f"TTS error: {traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
- 
- 
+
+
 @app.route("/chat", methods=["POST"])
 def chat():
     try:
@@ -78,12 +75,12 @@ def chat():
         messages = data.get("messages", [])
         system = data.get("system", "")
         anthropic_key = data.get("anthropic_key", "")
- 
+
         if not messages or not anthropic_key:
             return jsonify({"error": "missing params"}), 400
- 
+
         print(f"Chat - {len(messages)} messages")
- 
+
         res = requests.post(
             "https://api.anthropic.com/v1/messages",
             headers={
@@ -99,23 +96,18 @@ def chat():
             },
             timeout=15
         )
- 
-        print(f"Anthropic status: {res.status_code}")
- 
+
         if not res.ok:
             print(f"Anthropic error: {res.text}")
             return jsonify({"error": res.text}), 500
- 
+
         return jsonify(res.json())
- 
+
     except Exception as e:
         print(f"Chat error: {traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
- 
- 
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
- 
-
-
