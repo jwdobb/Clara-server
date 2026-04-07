@@ -30,17 +30,16 @@ def tts():
                 "Content-Type": "application/json",
                 "xi-api-key": eleven_key
             },
-           json={
-    "text": text,
-    "model_id": "eleven_turbo_v2_5",
-    "voice_settings": {
-        "stability": 0.75,
-        "similarity_boost": 0.90,
-        "style": 0.0,
-        "use_speaker_boost": True,
-        "speed": 1.15
-    }
-},
+            json={
+                "text": text,
+                "model_id": "eleven_multilingual_v2",
+                "voice_settings": {
+                    "stability": 0.82,
+                    "similarity_boost": 0.80,
+                    "style": 0.0,
+                    "use_speaker_boost": False
+                }
+            },
             stream=True,
             timeout=20
         )
