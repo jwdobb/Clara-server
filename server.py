@@ -17,7 +17,7 @@ def tts():
         data = request.get_json(force=True)
         text = data.get("text", "")
         eleven_key = data.get("eleven_key", "")
-        voice_id = data.get("voice_id", "XB0fDUnXU5powFXDhCwa")
+        voice_id = data.get("voice_id", "lvQdCgwZfBuOzxyV5pxu")
 
         if not text or not eleven_key:
             return jsonify({"error": "missing params"}), 400
