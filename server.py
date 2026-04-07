@@ -22,7 +22,7 @@ def tts():
         if not text or not eleven_key:
             return jsonify({"error": "missing params"}), 400
 
-        print(f"TTS - {len(text)} chars")
+        print(f"TTS - {len(text)} chars, voice: {voice_id[:8]}")
 
         res = requests.post(
             f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream",
@@ -34,15 +34,17 @@ def tts():
                 "text": text,
                 "model_id": "eleven_multilingual_v2",
                 "voice_settings": {
-                    "stability": 0.82,
-                    "similarity_boost": 0.80,
-                    "style": 0.0,
-                    "use_speaker_boost": False
+                    "stability": 0.55,
+                    "similarity_boost": 0.95,
+                    "style": 0.15,
+                    "use_speaker_boost": True
                 }
             },
             stream=True,
             timeout=20
         )
+
+        print(f"ElevenLabs status: {res.status_code}")
 
         if not res.ok:
             print(f"ElevenLabs error: {res.text}")
@@ -96,6 +98,8 @@ def chat():
             },
             timeout=15
         )
+
+        print(f"Anthropic status: {res.status_code}")
 
         if not res.ok:
             print(f"Anthropic error: {res.text}")
